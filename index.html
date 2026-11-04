@@ -31,12 +31,17 @@
 <script src="flex.js"></script>
 <script src="render.js"></script>
 <script>
-  const base = location.href.replace(/[^/]*([?#].*)?$/, "");
-  const msg = buildFlex(base);
-  renderFlex(msg, document.getElementById("preview"));
-
   const btnShare = document.getElementById("share");
   const status = document.getElementById("status");
+  status.style.whiteSpace = "pre-line";
+
+  let msg = null;
+  try {
+    msg = buildFlex();
+    renderFlex(msg, document.getElementById("preview"));
+  } catch (e) {
+    status.textContent = e.message;
+  }
 
   async function share() {
     try {
@@ -47,10 +52,12 @@
     }
   }
 
-  if (LIFF_ID.startsWith("請填入")) {
-    status.textContent = "預覽模式：尚未設定 LIFF ID";
+  if (!msg) {
+    // 設定有誤，錯誤訊息已顯示
+  } else if (!hasLiff()) {
+    status.textContent = "預覽模式：尚未設定 LIFF ID，暫時無法分享";
   } else {
-    liff.init({ liffId: LIFF_ID }).then(() => {
+    liff.init({ liffId: CONFIG.liffId }).then(() => {
       if (!liff.isLoggedIn()) return liff.login();
       if (!liff.isApiAvailable("shareTargetPicker")) {
         status.textContent = "請在 LINE App 裡開啟這個連結";
