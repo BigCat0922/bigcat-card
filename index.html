@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>林敬謙 Big Cat｜繆思雅集</title>
+<style>
+  body { margin: 0; background: #e8ebe4; font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif; color: #4A5247; }
+  header { padding: 20px 16px 8px; }
+  header h1 { margin: 0; font-size: 18px; color: #5F6E5B; }
+  header p { margin: 4px 0 0; font-size: 13px; color: #8A9387; }
+  .chat { background: #8CABD9; padding: 14px 0; }
+  .actions { padding: 16px; }
+  .share { width: 100%; height: 52px; border: 0; border-radius: 10px; background: #5F6E5B; color: #fff; font-size: 17px; cursor: pointer; }
+  .share:disabled { opacity: .5; }
+  #status { margin-top: 10px; font-size: 13px; color: #8A9387; text-align: center; min-height: 1em; }
+</style>
+</head>
+<body>
+<header>
+  <h1>林敬謙 Big Cat 的名片</h1>
+  <p>左右滑動預覽，按下方按鈕就能傳給 LINE 好友或群組</p>
+</header>
+<div class="chat" id="preview"></div>
+<div class="actions">
+  <button class="share" id="share" disabled>選擇好友或群組分享</button>
+  <div id="status">載入中…</div>
+</div>
+
+<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<script src="flex.js"></script>
+<script src="render.js"></script>
+<script>
+  const base = location.href.replace(/[^/]*([?#].*)?$/, "");
+  const msg = buildFlex(base);
+  renderFlex(msg, document.getElementById("preview"));
+
+  const btnShare = document.getElementById("share");
+  const status = document.getElementById("status");
+
+  async function share() {
+    try {
+      const res = await liff.shareTargetPicker([msg]);
+      status.textContent = res ? "已送出，謝謝分享！" : "已取消";
+    } catch (e) {
+      status.textContent = "分享失敗：" + e.message;
+    }
+  }
+
+  if (LIFF_ID.startsWith("請填入")) {
+    status.textContent = "預覽模式：尚未設定 LIFF ID";
+  } else {
+    liff.init({ liffId: LIFF_ID }).then(() => {
+      if (!liff.isLoggedIn()) return liff.login();
+      if (!liff.isApiAvailable("shareTargetPicker")) {
+        status.textContent = "請在 LINE App 裡開啟這個連結";
+        return;
+      }
+      btnShare.disabled = false;
+      btnShare.onclick = share;
+      status.textContent = "";
+      share();
+    }).catch((e) => { status.textContent = "LIFF 初始化失敗：" + e.message; });
+  }
+</script>
+</body>
+</html>
