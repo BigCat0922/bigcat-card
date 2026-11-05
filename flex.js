@@ -1,5 +1,6 @@
 // 大貓老師 LINE 電子名片：Flex Message carousel（5 張 bubble）
-//   1. 名片  2. 近期獲獎（公司獲獎＋黑松酒覓作品獲獎）  3. 歷年作品獎項  4. 個人專業資格  5. 我們做的事
+//   1. 名片  2. 近期獲獎（公司獲獎＋黑松酒覓作品獲獎）  3. 歷年作品獎項
+//   4. 個人專業資格＋專業經歷  5. 我們做的事＋團隊實績
 //
 // 分享流程說明：
 // - 這個檔案只負責「組出 Flex Message JSON」，本身不會傳訊息。
@@ -16,15 +17,14 @@
 //
 // 需要部署到 CONFIG.imageBase 的圖片（LINE 只接受公開 HTTPS 的 JPEG／PNG，單張建議 1MB 以內）：
 // - portrait.jpg：形象照，3:4，建議 900×1200
-// - work2.jpg：個人資格卡片主圖，3:2（以 20:13 裁切顯示），建議 1000×667
 // - work1.jpg：作品卡片主圖，3:2（以 20:13 裁切顯示），建議 1000×667
 //
-// 完整獲獎紀錄頁 awards.html 也讀取本檔的 AWARDS／CREDENTIALS，兩邊資料只需改這裡。
+// 完整獲獎紀錄頁 awards.html 也讀取本檔的 AWARDS／CREDENTIALS／EXPERIENCE／TEAM，兩邊資料只需改這裡。
 
 const CONFIG = {
   // 公開 HTTPS 圖片資料夾，結尾斜線有無皆可
   imageBase: "https://bigcat0922.github.io/bigcat-card/img",
-  images: { portrait: "portrait.jpg", work1: "work1.jpg", work2: "work2.jpg" },
+  images: { portrait: "portrait.jpg", work1: "work1.jpg" },
 
   // 名片頁（index.html）網址；也是 LIFF app 的 Endpoint URL
   cardPageUrl: "https://bigcat0922.github.io/bigcat-card/",
@@ -38,9 +38,6 @@ const CONFIG = {
   address: "台北市大安區復興南路一段103號7樓之13",
   phoneDisplay: "0918-333-360",
   phoneTel: "0918333360",
-
-  // 待本人確認後再把 show 改成 true（文字出自 linkgoods 個人簡介）
-  pendingCredential: { show: false, text: "健康裝修認證 70+ 件｜全台第一" },
 
   // 作品卡片的精選案例，可替換；show 為 false 時不顯示
   featuredCase: { show: true, label: "精選案例", text: "萬華 60 坪老屋翻新" },
@@ -108,20 +105,38 @@ const AWARDS = {
   ],
 };
 
-// 個人專業資格（證照），與公司獲獎、作品獲獎分開
-const CREDENTIALS = [
-  {
-    name: "台灣病態建築（一級）診斷士",
-    cert: "台灣病態建築(一級)診斷士資格證書",
-    valid: "2023.10.29–2028.10.28",
-  },
-  {
-    name: "綠設計師 Green Designer",
-    cert: "GD 綠裝修認證專案執行人員合格證書",
-    valid: "2026.10.01–2029.09.30",
-    link: "https://musehealthyhome.com/articles/gd-green-designer-credentials",
-  },
-];
+// 個人證照與專業資格：名稱以官方個人介紹頁（LINKS.about）為準；
+// 證號、效期只寫來源頁有明列的，沒有就留空，不自行補寫
+const CREDENTIALS = {
+  // 名片上逐項顯示的主要資格
+  main: [
+    { name: "建築物室內設計乙級技術士", details: ["證號 125-003298"] },
+    { name: "病態建築診斷協會一級診斷士", details: [] },
+    {
+      name: "綠設計師／Green Designer",
+      details: ["GD綠裝修認證專案執行人員合格證書", "證書編號 GDTW2009009", "有效期間 2026.10.01–2029.09.30"],
+      link: "https://musehealthyhome.com/articles/gd-green-designer-credentials",
+    },
+  ],
+  // 名片上以兩欄並列的其他資格（官方頁「永續與管理」）
+  others: ["ESG 永續規劃師", "危老重建推動師", "防火管理人", "租賃住宅管理師"],
+};
+
+// 業界經歷與專業分享：不是證照，分開呈現
+const EXPERIENCE = {
+  roles: [
+    "104 人力銀行「工作世界」業界講師",
+    "企業營運管理顧問",
+    "曾任新瓦建設管理部經理、廣西菓緹 GOTEA 總經理",
+  ],
+  sharing: "自 2017 年起持續於企業、學校與專業組織分享室內設計、健康裝修、職涯、創業與 AI 應用",
+};
+
+// 繆思雅集團隊實績：公司成果，不是個人證照
+const TEAM = {
+  gd: { total: 71, gold: 62, standard: 9, asOf: "2026.08.01" },
+  sbsPassed: 17, // 病態建築診斷合格案件；來源頁未標示統計日期
+};
 
 const C = {
   sageDark: "#5F6E5B",
@@ -145,7 +160,7 @@ function checkConfig() {
   }
   if (!isHttps(CONFIG.cardPageUrl)) errors.push("CONFIG.cardPageUrl 必須是 HTTPS 網址");
   Object.entries(LINKS).forEach(([k, u]) => { if (!isHttps(u)) errors.push(`LINKS.${k} 必須是 HTTPS 網址`); });
-  [AWARDS.featuredWork, ...AWARDS.pastWorks, ...CREDENTIALS].forEach((x) => {
+  [AWARDS.featuredWork, ...AWARDS.pastWorks, ...CREDENTIALS.main].forEach((x) => {
     if (x.link && !isHttps(x.link)) errors.push(`「${x.title || x.name}」的連結必須是 HTTPS 網址`);
   });
   if (CONFIG.liffId && !LIFF_ID_PATTERN.test(CONFIG.liffId)) {
@@ -165,7 +180,7 @@ const t = (text, o = {}) => ({ type: "text", text, wrap: true, color: C.text, si
 const sep = (margin = "lg") => ({ type: "separator", margin, color: C.goldLight });
 const eyebrow = (text, align = "start") => t(text, { size: "xxs", color: C.gold, weight: "bold", align });
 const heading = (text) => t(text, { size: "xl", weight: "bold", margin: "sm", color: C.sageDark });
-// 區分「公司獲獎／作品獲獎／個人資格」的分類標籤
+// 區分「公司獲獎／作品獲獎／個人資格／專業經歷／團隊實績」的分類標籤
 const tag = (text) => t(text, { size: "xs", color: C.gold, weight: "bold", margin: "lg" });
 const bullet = (text, margin = "sm") => ({
   type: "box", layout: "baseline", spacing: "sm", margin,
@@ -278,35 +293,77 @@ function buildFlex() {
     footer: footer([btn("查看完整獲獎紀錄", LINKS.awardsPage, "primary", C.sageDark)]),
   });
 
-  const credentialRows = CREDENTIALS.flatMap((c, i) => [
-    ...(i ? [sep("md")] : []),
-    t(c.name, { size: "md", weight: "bold", margin: "md", color: C.sageDark, ...(c.link ? { action: uri("資格說明", c.link) } : {}) }),
-    t(c.cert, { size: "xs", color: C.sub, margin: "xs" }),
-    t(`有效期間 ${c.valid}`, { size: "xs", margin: "xs" }),
-  ]);
-  if (CONFIG.pendingCredential.show) credentialRows.push(sep("md"), bullet(CONFIG.pendingCredential.text, "md"));
-  const gdLink = CREDENTIALS.find((c) => c.link);
+  // 主要資格：名稱用 sm 粗體、可換行，細節另起一行，避免被裁切
+  const mainRows = CREDENTIALS.main.map((c) => ({
+    type: "box", layout: "vertical", margin: "md",
+    contents: [
+      t(c.name, { weight: "bold", color: C.sageDark, ...(c.link ? { action: uri("資格說明", c.link) } : {}) }),
+      ...c.details.map((d) => t(d, { size: "xs", color: C.sub })),
+    ],
+  }));
+  // 其他資格兩兩一列
+  const otherRows = [];
+  for (let i = 0; i < CREDENTIALS.others.length; i += 2) {
+    const pair = CREDENTIALS.others.slice(i, i + 2);
+    otherRows.push({
+      type: "box", layout: "horizontal", spacing: "md", margin: "sm",
+      contents: pair.map((name) => ({
+        type: "box", layout: "baseline", spacing: "sm", flex: 1,
+        contents: [t("◆", { size: "xxs", color: C.gold, flex: 0 }), t(name, { flex: 1 })],
+      })),
+    });
+  }
+  const gdLink = CREDENTIALS.main.find((c) => c.link);
 
   const credentials = bubble({
-    hero: hero(img("work2"), "20:13"),
     body: body([
       eyebrow("PERSONAL CREDENTIALS"),
       heading("個人專業資格"),
-      t("安全・舒適・健康｜低甲醛健康裝修", { size: "xs", color: C.sub, margin: "sm" }),
+      tag("個人證照與資格"),
+      ...mainRows,
+      { type: "box", layout: "vertical", margin: "md", contents: otherRows },
       sep(),
-      tag("個人資格"),
-      ...credentialRows,
+      tag("專業經歷"),
+      ...EXPERIENCE.roles.map((r) => bullet(r)),
+      bullet("2017 年起持續於企業、學校與專業組織公開分享"),
     ]),
     footer: footer([
+      btn("查看完整專業介紹", LINKS.about, "primary", C.sageDark),
       ...(gdLink ? [btn("綠設計師資格說明", gdLink.link, "secondary", C.goldLight)] : []),
-      btn("認識大貓老師", LINKS.about, "link", C.sageDark),
     ]),
   });
+
+  // 團隊實績：大數字＋說明
+  const stat = (num, label, note) => ({
+    type: "box", layout: "vertical", flex: 1,
+    contents: [
+      {
+        type: "text", color: C.gold,
+        contents: [
+          { type: "span", text: String(num), size: "xxl", weight: "bold" },
+          { type: "span", text: " 件", size: "xs" },
+        ],
+      },
+      t(label, { size: "xs", weight: "bold", color: C.sageDark }),
+      ...(note ? [t(note, { size: "xxs", color: C.sub })] : []),
+    ],
+  });
+  const g = TEAM.gd;
 
   const workBody = [
     eyebrow("WHAT WE DO"),
     heading("我們做的事"),
     t("老屋翻新・新成屋裝修\n健康宅・低甲醛規劃", { margin: "lg" }),
+    sep(),
+    tag("團隊實績｜繆思雅集"),
+    {
+      type: "box", layout: "horizontal", spacing: "md", margin: "sm",
+      contents: [
+        stat(g.total, "GD 綠裝修認證", `黃金級 ${g.gold}・標準級 ${g.standard}`),
+        stat(TEAM.sbsPassed, "病態建築診斷合格"),
+      ],
+    },
+    t(`GD 綠裝修認證案件統計至 ${g.asOf}`, { size: "xxs", color: C.sub, margin: "sm" }),
   ];
   if (CONFIG.featuredCase.show) {
     workBody.push(

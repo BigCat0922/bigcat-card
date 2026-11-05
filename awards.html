@@ -27,11 +27,15 @@
   .note { display: block; font-size: 12px; color: var(--sub); }
   a.more { display: inline-block; margin-top: 10px; color: var(--sage); font-weight: 700; font-size: 14px; text-decoration: none; }
   a.more:hover { text-decoration: underline; }
+  .stat { display: flex; gap: 14px; align-items: center; padding: 8px 0; }
+  .stat b { font-size: 32px; color: var(--gold); min-width: 2.2em; }
+  .stat span { display: block; }
   .back { display: block; margin-top: 32px; text-align: center; padding: 14px; border-radius: 10px; background: var(--sage); color: #fff; text-decoration: none; }
 </style>
 </head>
 <body>
 <main>
+  <!-- 資料都來自 flex.js 的 AWARDS／TEAM／CREDENTIALS／EXPERIENCE -->
   <div class="eyebrow">AWARDS &amp; RECOGNITION</div>
   <h1>獲獎與專業肯定</h1>
   <p class="lead">林敬謙 Big Cat｜繆思雅集營運總監／設計師</p>
@@ -46,9 +50,19 @@
     <p class="hint">依作品分列，點各作品的「查看詳細紀錄」看原始紀錄</p>
   </section>
 
+  <section id="team">
+    <h2>團隊實績</h2>
+    <p class="hint">繆思雅集團隊成果，非個人證照</p>
+  </section>
+
   <section id="credentials">
     <h2>個人資格</h2>
-    <p class="hint">林敬謙本人持有的專業證照</p>
+    <p class="hint">林敬謙本人持有的證照與專業資格，名稱依官方個人介紹頁</p>
+  </section>
+
+  <section id="experience">
+    <h2>專業經歷</h2>
+    <p class="hint">業界經歷與專業分享，非證照</p>
   </section>
 
   <a class="back" href="./">回到名片</a>
@@ -78,16 +92,42 @@
     works.append(card);
   });
 
+  const team = document.getElementById("team");
+  const g = TEAM.gd;
+  [[g.total, "GD 綠裝修認證案件", `黃金級 ${g.gold} 件、標準級 ${g.standard} 件；統計至 ${g.asOf}`],
+   [TEAM.sbsPassed, "病態建築診斷合格案件", ""]].forEach(([num, label, note]) => {
+    const row = h("div", "stat");
+    row.append(h("b", "", String(num)));
+    const txt = h("div"); txt.append(h("span", "", label)); if (note) txt.append(h("span", "note", note));
+    row.append(txt);
+    team.append(row);
+  });
+
   const creds = document.getElementById("credentials");
-  CREDENTIALS.forEach((c) => {
+  CREDENTIALS.main.forEach((c) => {
     const card = h("div", "card");
     card.append(h("h3", "", c.name));
-    const ul = h("ul");
-    ul.append(h("li", "", c.cert), h("li", "", `有效期間 ${c.valid}`));
-    card.append(ul);
+    if (c.details.length) {
+      const ul = h("ul");
+      c.details.forEach((d) => ul.append(h("li", "", d)));
+      card.append(ul);
+    }
     if (c.link) card.append(more(c.link, "查看資格說明 →"));
     creds.append(card);
   });
+  const others = h("div", "card");
+  others.append(h("h3", "", "永續與管理"));
+  const oul = h("ul");
+  CREDENTIALS.others.forEach((n) => oul.append(h("li", "", n)));
+  others.append(oul);
+  creds.append(others);
+
+  const exp = document.getElementById("experience");
+  const ecard = h("div", "card");
+  const eul = h("ul");
+  [...EXPERIENCE.roles, EXPERIENCE.sharing].forEach((r) => eul.append(h("li", "", r)));
+  ecard.append(eul, more(LINKS.about, "查看完整專業介紹 →"));
+  exp.append(ecard);
 </script>
 </body>
 </html>
