@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>獲獎與專業肯定｜林敬謙 Big Cat</title>
+<style>
+  :root { --sage: #5F6E5B; --gold: #B8975A; --gold-l: #E4D3AE; --cream: #F6F4EE; --text: #4A5247; --sub: #8A9387; }
+  body { margin: 0; background: var(--cream); color: var(--text); font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif; line-height: 1.6; }
+  main { max-width: 640px; margin: 0 auto; padding: 28px 16px 48px; }
+  .eyebrow { font-size: 12px; letter-spacing: .12em; color: var(--gold); font-weight: 700; }
+  h1 { margin: 4px 0 2px; font-size: 26px; color: var(--sage); }
+  .lead { margin: 0; color: var(--sub); font-size: 14px; }
+  section { margin-top: 28px; padding-top: 18px; border-top: 1px solid var(--gold-l); }
+  h2 { margin: 0 0 4px; font-size: 13px; color: var(--gold); letter-spacing: .08em; }
+  .hint { margin: 0 0 12px; font-size: 13px; color: var(--sub); }
+  .rank { display: flex; justify-content: space-between; align-items: baseline; padding: 8px 0; }
+  .rank b { font-size: 28px; color: var(--gold); }
+  .rank b small { font-size: 13px; font-weight: 400; }
+  .rank:not(:first-of-type) b { font-size: 20px; color: var(--sage); }
+  .card { background: #fff; border-radius: 12px; padding: 16px; margin-top: 12px; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
+  .card h3 { margin: 0 0 6px; font-size: 17px; color: var(--sage); }
+  .card .summary { margin: -2px 0 8px; font-size: 13px; color: var(--sub); }
+  ul { margin: 0; padding-left: 1.2em; }
+  li { margin: 4px 0; font-size: 15px; }
+  li::marker { color: var(--gold); }
+  .note { display: block; font-size: 12px; color: var(--sub); }
+  a.more { display: inline-block; margin-top: 10px; color: var(--sage); font-weight: 700; font-size: 14px; text-decoration: none; }
+  a.more:hover { text-decoration: underline; }
+  .back { display: block; margin-top: 32px; text-align: center; padding: 14px; border-radius: 10px; background: var(--sage); color: #fff; text-decoration: none; }
+</style>
+</head>
+<body>
+<main>
+  <div class="eyebrow">AWARDS &amp; RECOGNITION</div>
+  <h1>獲獎與專業肯定</h1>
+  <p class="lead">林敬謙 Big Cat｜繆思雅集營運總監／設計師</p>
+
+  <section id="company">
+    <h2>公司獲獎</h2>
+    <p class="hint">繆思雅集室內裝修設計，名次依獎座標示</p>
+  </section>
+
+  <section id="works">
+    <h2>作品獲獎</h2>
+    <p class="hint">依作品分列，點各作品的「查看詳細紀錄」看原始紀錄</p>
+  </section>
+
+  <section id="credentials">
+    <h2>個人資格</h2>
+    <p class="hint">林敬謙本人持有的專業證照</p>
+  </section>
+
+  <a class="back" href="./">回到名片</a>
+</main>
+
+<script src="flex.js"></script>
+<script>
+  const h = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text) n.textContent = text; return n; };
+  const more = (href, label = "查看詳細紀錄 →") => { const a = h("a", "more", label); a.href = href; a.target = "_blank"; a.rel = "noopener"; return a; };
+
+  const company = document.getElementById("company");
+  AWARDS.company.forEach((a) => {
+    const row = h("div", "rank");
+    row.append(h("span", "", `${a.year} ${a.name}`));
+    const b = h("b", "", a.rank); b.append(h("small", "", a.of)); row.append(b);
+    company.append(row);
+  });
+
+  const works = document.getElementById("works");
+  [AWARDS.featuredWork, ...AWARDS.pastWorks].forEach((w) => {
+    const card = h("div", "card");
+    card.append(h("h3", "", w.title));
+    if (w.summary) card.append(h("p", "summary", w.summary));
+    const ul = h("ul");
+    w.awards.forEach((a) => { const li = h("li", "", a.text); if (a.note) li.append(h("span", "note", a.note)); ul.append(li); });
+    card.append(ul, more(w.link));
+    works.append(card);
+  });
+
+  const creds = document.getElementById("credentials");
+  CREDENTIALS.forEach((c) => {
+    const card = h("div", "card");
+    card.append(h("h3", "", c.name));
+    const ul = h("ul");
+    ul.append(h("li", "", c.cert), h("li", "", `有效期間 ${c.valid}`));
+    card.append(ul);
+    if (c.link) card.append(more(c.link, "查看資格說明 →"));
+    creds.append(card);
+  });
+</script>
+</body>
+</html>

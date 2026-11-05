@@ -1,4 +1,5 @@
-// 大貓老師 LINE 電子名片：Flex Message carousel（3 張 bubble）
+// 大貓老師 LINE 電子名片：Flex Message carousel（5 張 bubble）
+//   1. 名片  2. 近期獲獎（公司獲獎＋黑松酒覓作品獲獎）  3. 歷年作品獎項  4. 個人專業資格  5. 我們做的事
 //
 // 分享流程說明：
 // - 這個檔案只負責「組出 Flex Message JSON」，本身不會傳訊息。
@@ -15,8 +16,10 @@
 //
 // 需要部署到 CONFIG.imageBase 的圖片（LINE 只接受公開 HTTPS 的 JPEG／PNG，單張建議 1MB 以內）：
 // - portrait.jpg：形象照，3:4，建議 900×1200
-// - work2.jpg：第二張卡片主圖，3:2（以 20:13 裁切顯示），建議 1000×667
-// - work1.jpg：第三張卡片主圖，3:2（以 20:13 裁切顯示），建議 1000×667
+// - work2.jpg：個人資格卡片主圖，3:2（以 20:13 裁切顯示），建議 1000×667
+// - work1.jpg：作品卡片主圖，3:2（以 20:13 裁切顯示），建議 1000×667
+//
+// 完整獲獎紀錄頁 awards.html 也讀取本檔的 AWARDS／CREDENTIALS，兩邊資料只需改這裡。
 
 const CONFIG = {
   // 公開 HTTPS 圖片資料夾，結尾斜線有無皆可
@@ -36,16 +39,10 @@ const CONFIG = {
   phoneDisplay: "0918-333-360",
   phoneTel: "0918333360",
 
-  // 第二張卡片的資格與獎項（只列本人已確認的項目）
-  credentials: [
-    "台灣病態建築診斷士",
-    "綠設計師",
-    "2026 鈦美獎百大設計公司 NO.4",
-  ],
   // 待本人確認後再把 show 改成 true（文字出自 linkgoods 個人簡介）
   pendingCredential: { show: false, text: "健康裝修認證 70+ 件｜全台第一" },
 
-  // 第三張卡片的精選案例，可替換；show 為 false 時不顯示
+  // 作品卡片的精選案例，可替換；show 為 false 時不顯示
   featuredCase: { show: true, label: "精選案例", text: "萬華 60 坪老屋翻新" },
 };
 
@@ -54,7 +51,77 @@ const LINKS = {
   about: "https://musehealthyhome.com/authors/lin-ching-chien",
   works: "https://www.muse-aristo.com.tw/album.php?lang=tw&tb=1",
   youtube: "https://youtube.com/@musearisto",
+  awardsPage: "https://bigcat0922.github.io/bigcat-card/awards.html",
 };
+
+// 公司獲獎、作品獲獎與個人資格分開存放，不可混寫
+const AWARDS = {
+  // 公司獲獎：rank 照獎座標示
+  company: [
+    { year: "2026", name: "鈦美獎百大設計公司", rank: "No.04", of: "/100" },
+    { year: "2024", name: "鈦美獎百大設計公司", rank: "No.07", of: "/100" },
+  ],
+  // 作品獲獎：名片第二張重點呈現的近期作品
+  featuredWork: {
+    title: "Liquor Explorer／黑松酒覓",
+    summary: "同一作品｜3 項國際金獎＋A' Design Award 銅獎",
+    link: "https://musehealthyhome.com/articles/muse-legacy-3032",
+    linkLabel: "黑松酒覓得獎紀錄",
+    awards: [
+      { text: "MUSE Design Awards 2026｜Gold Winner" },
+      { text: "Tokyo Design Awards 2026｜Gold" },
+      { text: "London Design Awards 2026｜Gold" },
+      { text: "A' Design Award 2025–2026｜Bronze（Spatial Design）",
+        note: "依主辦方電子證書；官方作品頁目前未公開" },
+      { text: "Twin-Cities Award Space Design 雙城獎｜優秀獎" },
+    ],
+  },
+  // 作品獲獎：歷年代表作品
+  pastWorks: [
+    {
+      title: "Real Explorer／拓荒者真美式",
+      link: "https://musehealthyhome.com/articles/real-explorer-international-design-awards",
+      awards: [
+        { text: "2021 MUSE Design Awards｜Silver Winner" },
+        { text: "2021 NOVUM Design Award｜Silver" },
+        { text: "2022 A' Design Award｜Iron" },
+        { text: "BERLIN Design Awards 2022｜入選紀錄", note: "官方 archive 顯示 Shortlist" },
+      ],
+    },
+    {
+      title: "2022 第二屆綠裝修設計大賞",
+      link: "https://musehealthyhome.com/articles/green-design-awards-2022",
+      awards: [
+        { text: "《二柴一貓》｜住宅類金獎" },
+        { text: "《星座與光》｜住宅類銀獎" },
+        { text: "《倚山謐境》｜住宅類銀獎" },
+      ],
+    },
+    {
+      title: "Lightly／輕輕",
+      link: "https://musehealthyhome.com/articles/lightly-tsda-green-design-recognition",
+      awards: [
+        { text: "2023–2024 鈦美獎｜B1 GD 認證組佳作" },
+        { text: "鈦美獎百大室內設計｜獎座標示 No.07/100" },
+      ],
+    },
+  ],
+};
+
+// 個人專業資格（證照），與公司獲獎、作品獲獎分開
+const CREDENTIALS = [
+  {
+    name: "台灣病態建築（一級）診斷士",
+    cert: "台灣病態建築(一級)診斷士資格證書",
+    valid: "2023.10.29–2028.10.28",
+  },
+  {
+    name: "綠設計師 Green Designer",
+    cert: "GD 綠裝修認證專案執行人員合格證書",
+    valid: "2026.10.01–2029.09.30",
+    link: "https://musehealthyhome.com/articles/gd-green-designer-credentials",
+  },
+];
 
 const C = {
   sageDark: "#5F6E5B",
@@ -68,15 +135,19 @@ const C = {
 const LIFF_ID_PATTERN = /^\d{10}-[A-Za-z0-9]{8}$/;
 const LABEL_MAX = 20;
 
+const isHttps = (u) => /^https:\/\/[^\s/]+\.[^\s]+/.test(u || "");
+
 // 回傳設定問題清單；空陣列代表可以使用
 function checkConfig() {
   const errors = [];
-  const isHttps = (u) => /^https:\/\/[^\s/]+\.[^\s]+/.test(u || "");
   if (!isHttps(CONFIG.imageBase) || /請填|example\.com|your/i.test(CONFIG.imageBase)) {
     errors.push("CONFIG.imageBase 必須是公開的 HTTPS 圖片網址");
   }
   if (!isHttps(CONFIG.cardPageUrl)) errors.push("CONFIG.cardPageUrl 必須是 HTTPS 網址");
   Object.entries(LINKS).forEach(([k, u]) => { if (!isHttps(u)) errors.push(`LINKS.${k} 必須是 HTTPS 網址`); });
+  [AWARDS.featuredWork, ...AWARDS.pastWorks, ...CREDENTIALS].forEach((x) => {
+    if (x.link && !isHttps(x.link)) errors.push(`「${x.title || x.name}」的連結必須是 HTTPS 網址`);
+  });
   if (CONFIG.liffId && !LIFF_ID_PATTERN.test(CONFIG.liffId)) {
     errors.push("CONFIG.liffId 格式不對，應為「10 位數字-8 碼英數」，未設定請留空字串");
   }
@@ -93,13 +164,17 @@ const img = (key) => joinUrl(CONFIG.imageBase, CONFIG.images[key]);
 const t = (text, o = {}) => ({ type: "text", text, wrap: true, color: C.text, size: "sm", ...o });
 const sep = (margin = "lg") => ({ type: "separator", margin, color: C.goldLight });
 const eyebrow = (text, align = "start") => t(text, { size: "xxs", color: C.gold, weight: "bold", align });
-const bullet = (text) => ({
-  type: "box", layout: "baseline", spacing: "sm", margin: "md",
-  contents: [t("◆", { size: "xxs", color: C.gold, flex: 0 }), t(text, { flex: 1 })],
+const heading = (text) => t(text, { size: "xl", weight: "bold", margin: "sm", color: C.sageDark });
+// 區分「公司獲獎／作品獲獎／個人資格」的分類標籤
+const tag = (text) => t(text, { size: "xs", color: C.gold, weight: "bold", margin: "lg" });
+const bullet = (text, margin = "sm") => ({
+  type: "box", layout: "baseline", spacing: "sm", margin,
+  contents: [t("◆", { size: "xxs", color: C.gold, flex: 0 }), t(text, { size: "xs", flex: 1 })],
 });
-const btn = (label, uri, style, color, extra = {}) => {
+const uri = (label, url) => ({ type: "uri", label, uri: url });
+const btn = (label, url, style, color, extra = {}) => {
   if (label.length > LABEL_MAX) throw new Error(`按鈕文字超過 ${LABEL_MAX} 字：${label}`);
-  return { type: "button", style, color, height: "sm", action: { type: "uri", label, uri }, ...extra };
+  return { type: "button", style, color, height: "sm", action: uri(label, url), ...extra };
 };
 const hero = (url, aspectRatio) => ({ type: "image", url, size: "full", aspectRatio, aspectMode: "cover" });
 const footer = (contents) => ({
@@ -107,6 +182,27 @@ const footer = (contents) => ({
 });
 const body = (contents) => ({
   type: "box", layout: "vertical", paddingAll: "20px", backgroundColor: C.cream, contents,
+});
+const bubble = (parts) => ({ type: "bubble", size: "mega", ...parts });
+
+// 公司排名列：左邊年份＋獎名，右邊大字名次
+const rankRow = (a, big) => ({
+  type: "box", layout: "horizontal", margin: big ? "sm" : "md", alignItems: "center",
+  contents: [
+    big
+      ? { type: "box", layout: "vertical", flex: 1, contents: [
+          t(a.year, { size: "xs", color: C.gold, weight: "bold" }),
+          t(a.name, { size: "sm", weight: "bold" }),
+        ] }
+      : t(`${a.year} ${a.name}`, { size: "xs", flex: 1 }),
+    {
+      type: "text", flex: 0, align: "end", color: big ? C.gold : C.sageDark,
+      contents: [
+        { type: "span", text: a.rank, size: big ? "xxl" : "lg", weight: "bold" },
+        { type: "span", text: a.of, size: "xs" },
+      ],
+    },
+  ],
 });
 
 function buildFlex() {
@@ -117,8 +213,7 @@ function buildFlex() {
     ? btn("分享我的名片", `https://liff.line.me/${CONFIG.liffId}`, "primary", C.sageDark)
     : btn("開啟名片頁", CONFIG.cardPageUrl, "primary", C.sageDark);
 
-  const profile = {
-    type: "bubble", size: "mega",
+  const profile = bubble({
     hero: hero(img("portrait"), "3:4"),
     body: body([
       eyebrow("MUSE ARISTO INTERIOR DESIGN", "end"),
@@ -145,27 +240,72 @@ function buildFlex() {
         ],
       },
     ]),
-  };
+  });
 
-  const credentials = [...CONFIG.credentials];
-  if (CONFIG.pendingCredential.show) credentials.unshift(CONFIG.pendingCredential.text);
+  const fw = AWARDS.featuredWork;
+  const [topCompany, ...otherCompany] = AWARDS.company;
+  const recentAwards = bubble({
+    body: body([
+      eyebrow("AWARDS & RECOGNITION"),
+      heading("獲獎與專業肯定"),
+      sep(),
+      tag("公司獲獎"),
+      rankRow(topCompany, true),
+      ...otherCompany.map((a) => rankRow(a, false)),
+      sep(),
+      tag("作品獲獎"),
+      t(fw.title, { size: "md", weight: "bold", margin: "sm", color: C.sageDark, action: uri("得獎紀錄", fw.link) }),
+      t(fw.summary, { size: "xs", color: C.sub, margin: "xs" }),
+      { type: "box", layout: "vertical", margin: "sm", contents: fw.awards.map((a) => bullet(a.text)) },
+    ]),
+    footer: footer([
+      btn(fw.linkLabel, fw.link, "primary", C.sageDark),
+      btn("查看完整獲獎紀錄", LINKS.awardsPage, "secondary", C.goldLight),
+    ]),
+  });
 
-  const promise = {
-    type: "bubble", size: "mega",
+  const pastAwards = bubble({
+    body: body([
+      eyebrow("AWARD ARCHIVE"),
+      heading("歷年作品獎項"),
+      t("點作品名稱可查看該作品的得獎紀錄", { size: "xxs", color: C.sub, margin: "sm" }),
+      ...AWARDS.pastWorks.flatMap((w) => [
+        sep(),
+        t(`${w.title}  ›`, { size: "sm", weight: "bold", margin: "lg", color: C.sageDark, action: uri("得獎紀錄", w.link) }),
+        ...w.awards.map((a) => bullet(a.text, "xs")),
+      ]),
+    ]),
+    footer: footer([btn("查看完整獲獎紀錄", LINKS.awardsPage, "primary", C.sageDark)]),
+  });
+
+  const credentialRows = CREDENTIALS.flatMap((c, i) => [
+    ...(i ? [sep("md")] : []),
+    t(c.name, { size: "md", weight: "bold", margin: "md", color: C.sageDark, ...(c.link ? { action: uri("資格說明", c.link) } : {}) }),
+    t(c.cert, { size: "xs", color: C.sub, margin: "xs" }),
+    t(`有效期間 ${c.valid}`, { size: "xs", margin: "xs" }),
+  ]);
+  if (CONFIG.pendingCredential.show) credentialRows.push(sep("md"), bullet(CONFIG.pendingCredential.text, "md"));
+  const gdLink = CREDENTIALS.find((c) => c.link);
+
+  const credentials = bubble({
     hero: hero(img("work2"), "20:13"),
     body: body([
-      eyebrow("OUR PROMISE"),
-      t("安全・舒適・健康", { size: "xl", weight: "bold", margin: "sm", color: C.sageDark }),
-      t("低甲醛健康裝修", { size: "xs", color: C.sub, margin: "sm" }),
+      eyebrow("PERSONAL CREDENTIALS"),
+      heading("個人專業資格"),
+      t("安全・舒適・健康｜低甲醛健康裝修", { size: "xs", color: C.sub, margin: "sm" }),
       sep(),
-      { type: "box", layout: "vertical", margin: "md", contents: credentials.map(bullet) },
+      tag("個人資格"),
+      ...credentialRows,
     ]),
-    footer: footer([btn("認識大貓老師", LINKS.about, "secondary", C.goldLight)]),
-  };
+    footer: footer([
+      ...(gdLink ? [btn("綠設計師資格說明", gdLink.link, "secondary", C.goldLight)] : []),
+      btn("認識大貓老師", LINKS.about, "link", C.sageDark),
+    ]),
+  });
 
   const workBody = [
     eyebrow("WHAT WE DO"),
-    t("我們做的事", { size: "xl", weight: "bold", margin: "sm", color: C.sageDark }),
+    heading("我們做的事"),
     t("老屋翻新・新成屋裝修\n健康宅・低甲醛規劃", { margin: "lg" }),
   ];
   if (CONFIG.featuredCase.show) {
@@ -176,19 +316,18 @@ function buildFlex() {
     );
   }
 
-  const works = {
-    type: "bubble", size: "mega",
+  const works = bubble({
     hero: hero(img("work1"), "20:13"),
     body: body(workBody),
     footer: footer([
       btn("看更多作品", LINKS.works, "primary", C.sageDark),
       btn("YouTube 頻道", LINKS.youtube, "link", C.sageDark),
     ]),
-  };
+  });
 
   return {
     type: "flex",
     altText: `${CONFIG.name} ${CONFIG.nameEn}｜${CONFIG.title}的名片`,
-    contents: { type: "carousel", contents: [profile, promise, works] },
+    contents: { type: "carousel", contents: [profile, recentAwards, pastAwards, credentials, works] },
   };
 }
