@@ -26,7 +26,7 @@ const CONFIG = {
   // 名片頁（index.html）網址；也是 LIFF app 的 Endpoint URL
   cardPageUrl: "https://bigcat0922.github.io/bigcat-card/",
   // LIFF ID 格式為「10 位數字-8 碼英數」，例如 1234567890-AbCdEfGh；未設定時保留空字串
-  liffId: "",
+  liffId: "2012386170-G2yztTfr",
 
   name: "林敬謙",
   nameEn: "Big Cat",
